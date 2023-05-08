@@ -122,7 +122,6 @@ def get_gen_params(
 ):
     is_chatglm = "chatglm" in model_name.lower()
     conv = get_conversation_template(model_name)
-
     for message in messages:
         msg_role = message["role"]
         if msg_role == "system":
