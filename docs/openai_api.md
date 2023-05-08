@@ -22,10 +22,15 @@ python3 -m fastchat.serve.model_worker --model-name 'vicuna-7b-v1.1' --model-pat
 Finally, launch the RESTful API server
 
 ```bash
-python3 -m fastchat.serve.api_server --host localhost --port 8000
+python3 -m fastchat.serve.openai_api_server --host localhost --port 8000
 ```
 
 Test the API server
+
+### List Models
+```bash
+curl http://localhost:8000/v1/models
+```
 
 ### Chat Completions
 ```bash
@@ -65,9 +70,9 @@ Assuming environment variable `FASTCHAT_BASEURL` is set to the API server URL (e
 
 ```python
 import os
-from fastchat import client
+from fastchat.client import openai_api_client as client
 
-client.set_baseurl(os.getenv("FASTCHAT_BASEURL"))
+client.set_baseurl(os.getenv("FASTCHAT_BASEURL", "http://localhost:8000"))
 
 completion = client.ChatCompletion.create(
   model="vicuna-7b-v1.1",
@@ -76,11 +81,13 @@ completion = client.ChatCompletion.create(
   ]
 )
 
-print(completion.choices[0].message)
+print(completion.choices[0].message.content)
 ```
 
-## Machine Learning with Embeddings
+### Streaming
+See [test_openai_client.py](../tests/test_openai_client.py).
 
+## Machine Learning with Embeddings
 You can use `create_embedding` to 
 - Build your own classifier, see [fastchat/playground/test_embedding/test_classification.py](../playground/test_embedding/test_classification.py)
 - Evaluate text similarity, see [fastchat/playground/test_embedding/test_sentence_similarity.py](../playground/test_embedding/test_sentence_similarity.py)
@@ -98,7 +105,7 @@ The script will train classifiers based on `vicuna-7b`, `text-similarity-ada-001
 ## Todos
 Some features to be implemented:
 
-- [ ] Streaming
-- [ ] Support of some parameters like `top_p`, `presence_penalty`
-- [ ] Proper error handling (e.g. model not found)
+- [ ] Support more parameters like `top_p`, `presence_penalty`
+- [ ] Report token usage for chat completion
+- [ ] Proper error handling (e.g., model not found)
 - [ ] The return value in the client SDK could be used like a dict
